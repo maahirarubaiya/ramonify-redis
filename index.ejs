@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ramonify – Redis</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f4f6fb; color: #1a1a2e; min-height: 100vh; }
+    nav { background: #2e4a7a; padding: 0 2rem; display: flex; align-items: center; gap: 2rem; height: 56px; }
+    nav .brand { font-size: 1.2rem; font-weight: 700; color: #fff; text-decoration: none; }
+    nav a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.9rem; }
+    nav a:hover { color: #fff; }
+    .container { max-width: 860px; margin: 2.5rem auto; padding: 0 1.5rem; }
+    h1 { font-size: 2rem; font-weight: 700; color: #2e4a7a; margin-bottom: 0.5rem; }
+    .subtitle { color: #666; font-size: 1rem; margin-bottom: 2.5rem; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+    .card { background: #fff; border-radius: 14px; padding: 1.6rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); text-decoration: none; color: inherit; border: 2px solid transparent; transition: border-color 0.2s, box-shadow 0.2s; }
+    .card:hover { border-color: #4472c4; box-shadow: 0 4px 16px rgba(46,74,122,0.12); }
+    .card-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+    .card h2 { font-size: 1rem; font-weight: 700; color: #2e4a7a; margin-bottom: 0.4rem; }
+    .card p { font-size: 0.85rem; color: #666; line-height: 1.5; }
+    .tag { display: inline-block; margin-top: 0.8rem; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: #eaf1fb; color: #2e4a7a; }
+    .stack { margin-top: 2rem; background: #fff; border-radius: 14px; padding: 1.4rem 1.8rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+    .stack h3 { font-size: 0.85rem; font-weight: 700; color: #2e4a7a; margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stack-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .pill { padding: 4px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+    .pill-blue { background: #2e4a7a; color: #fff; }
+    .pill-gray { background: #eef0f6; color: #444; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">💰 Ramonify</a>
+    <a href="/sessions">Sessions</a>
+    <a href="/budget">Budget Cache</a>
+    <a href="/top-categories">Top Categories</a>
+  </nav>
+
+  <div class="container">
+    <h1>Ramonify Redis</h1>
+    <p class="subtitle">Personal Finance Database — In-Memory Layer | CS 3200 Project 3</p>
+
+    <div class="grid">
+      <a href="/sessions" class="card">
+        <div class="card-icon">🔐</div>
+        <h2>Session Management</h2>
+        <p>Track logged-in users with Redis Hashes and automatic TTL expiry.</p>
+        <span class="tag">Hash</span>
+      </a>
+      <a href="/budget" class="card">
+        <div class="card-icon">📊</div>
+        <h2>Budget Status Cache</h2>
+        <p>Cache per-user category budget consumption ranked by urgency.</p>
+        <span class="tag">Sorted Set</span>
+      </a>
+      <a href="/top-categories" class="card">
+        <div class="card-icon">🏆</div>
+        <h2>Top Categories</h2>
+        <p>Global leaderboard of highest spending categories across all users.</p>
+        <span class="tag">Sorted Set</span>
+      </a>
+    </div>
+
+    <div class="stack">
+      <h3>Tech Stack</h3>
+      <div class="stack-row">
+        <span class="pill pill-blue">Node.js</span>
+        <span class="pill pill-blue">Express</span>
+        <span class="pill pill-blue">Redis</span>
+        <span class="pill pill-blue">EJS</span>
+        <span class="pill pill-gray">Hashes</span>
+        <span class="pill pill-gray">Sorted Sets</span>
+        <span class="pill pill-gray">TTL</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

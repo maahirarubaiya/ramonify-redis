@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Top Categories – Ramonify</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f4f6fb; color: #1a1a2e; min-height: 100vh; }
+    nav { background: #2e4a7a; padding: 0 2rem; display: flex; align-items: center; gap: 2rem; height: 56px; }
+    nav .brand { font-size: 1.2rem; font-weight: 700; color: #fff; text-decoration: none; }
+    nav a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.9rem; padding: 4px 0; border-bottom: 2px solid transparent; }
+    nav a:hover, nav a.active { color: #fff; border-bottom-color: #7eb3ff; }
+    .container { max-width: 860px; margin: 2.5rem auto; padding: 0 1.5rem; }
+    h1 { font-size: 1.6rem; font-weight: 700; color: #2e4a7a; margin-bottom: 0.3rem; }
+    .subtitle { color: #666; font-size: 0.88rem; margin-bottom: 1.8rem; }
+    .card { background: #fff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin-bottom: 1.5rem; }
+    .card h2 { font-size: 0.95rem; font-weight: 700; color: #2e4a7a; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #eef0f6; }
+    .form-row { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: flex-end; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
+    label { font-size: 0.75rem; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 0.4px; }
+    input { padding: 8px 12px; border: 1px solid #dde1ee; border-radius: 8px; font-size: 0.9rem; background: #fafbff; color: #1a1a2e; width: 100%; }
+    input:focus { outline: none; border-color: #4472c4; }
+    .btn { padding: 8px 18px; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: #2e4a7a; color: #fff; }
+    .btn-success { background: #2e7a4a; color: #fff; }
+    .btn-danger  { background: #c0392b; color: #fff; }
+    .btn-sm { padding: 5px 12px; font-size: 0.78rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th { background: #f0f3fb; color: #2e4a7a; font-weight: 600; padding: 10px 14px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.4px; }
+    td { padding: 10px 14px; border-bottom: 1px solid #f0f0f5; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafbff; }
+    .empty { text-align: center; padding: 2rem; color: #aaa; font-size: 0.9rem; }
+    .actions { display: flex; gap: 6px; }
+    .bar-wrap { background: #eef0f6; border-radius: 20px; height: 8px; width: 160px; }
+    .bar { height: 8px; border-radius: 20px; background: #2e4a7a; }
+    .rank-1 { font-size: 1.1rem; }
+    .mono { font-family: monospace; font-size: 0.82rem; color: #555; background: #f4f6fb; padding: 2px 6px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">💰 Ramonify</a>
+    <a href="/sessions">Sessions</a>
+    <a href="/budget">Budget Cache</a>
+    <a href="/top-categories" class="active">Top Categories</a>
+  </nav>
+
+  <div class="container">
+    <h1>🏆 Top Spending Categories</h1>
+    <p class="subtitle">Redis Sorted Set — key: topCategories — score: total $ spent across all users</p>
+
+    <!-- CREATE -->
+    <div class="card">
+      <h2>Add Category to Leaderboard — CREATE</h2>
+      <form action="/top-categories" method="POST">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <input type="text" name="category" placeholder="e.g. Rent" required />
+          </div>
+          <div class="form-group">
+            <label>Initial Total ($)</label>
+            <input type="number" name="amount" placeholder="e.g. 1200.00" step="0.01" required />
+          </div>
+          <button type="submit" class="btn btn-primary">Add</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- READ -->
+    <div class="card">
+      <h2>Global Spending Leaderboard — READ &nbsp;<span class="mono">topCategories</span></h2>
+      <% if (entries.length === 0) { %>
+        <div class="empty">No categories yet. Add one above.</div>
+      <% } else {
+          const maxScore = entries.length > 0 ? parseFloat(entries[0].score) : 1;
+          const medals = ['🥇','🥈','🥉'];
+      %>
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Category</th>
+              <th>Total Spent</th>
+              <th>Share of Top</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% entries.forEach((e, i) => {
+                const pct = (parseFloat(e.score) / maxScore) * 100;
+            %>
+              <tr>
+                <td><%= medals[i] || '#' + (i+1) %></td>
+                <td><strong><%= e.value %></strong></td>
+                <td><strong>$<%= parseFloat(e.score).toFixed(2) %></strong></td>
+                <td>
+                  <div class="bar-wrap">
+                    <div class="bar" style="width:<%= pct.toFixed(1) %>%;"></div>
+                  </div>
+                </td>
+                <td>
+                  <div class="actions">
+                    <form action="/top-categories/delete" method="POST">
+                      <input type="hidden" name="category" value="<%= e.value %>" />
+                      <button class="btn btn-danger btn-sm">Remove</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+    </div>
+
+    <!-- UPDATE -->
+    <div class="card">
+      <h2>Record a Transaction — UPDATE (ZINCRBY)</h2>
+      <form action="/top-categories/increment" method="POST">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <input type="text" name="category" placeholder="e.g. Groceries" required />
+          </div>
+          <div class="form-group">
+            <label>Amount ($)</label>
+            <input type="number" name="amount" placeholder="e.g. 84.50" step="0.01" required />
+          </div>
+          <button type="submit" class="btn btn-success">Add to Total</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- DELETE ALL -->
+    <div class="card">
+      <h2>Clear Leaderboard — DELETE</h2>
+      <form action="/top-categories/clear" method="POST">
+        <button type="submit" class="btn btn-danger" onclick="return confirm('Clear the entire leaderboard?')">
+          Clear All Categories
+        </button>
+      </form>
+    </div>
+
+  </div>
+</body>
+</html>

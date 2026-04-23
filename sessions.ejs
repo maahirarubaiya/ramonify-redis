@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sessions – Ramonify</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f4f6fb; color: #1a1a2e; min-height: 100vh; }
+    nav { background: #2e4a7a; padding: 0 2rem; display: flex; align-items: center; gap: 2rem; height: 56px; }
+    nav .brand { font-size: 1.2rem; font-weight: 700; color: #fff; text-decoration: none; }
+    nav a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.9rem; padding: 4px 0; border-bottom: 2px solid transparent; }
+    nav a:hover, nav a.active { color: #fff; border-bottom-color: #7eb3ff; }
+    .container { max-width: 860px; margin: 2.5rem auto; padding: 0 1.5rem; }
+    h1 { font-size: 1.6rem; font-weight: 700; color: #2e4a7a; margin-bottom: 0.3rem; }
+    .subtitle { color: #666; font-size: 0.88rem; margin-bottom: 1.8rem; }
+    .card { background: #fff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin-bottom: 1.5rem; }
+    .card h2 { font-size: 0.95rem; font-weight: 700; color: #2e4a7a; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #eef0f6; }
+    .form-row { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: flex-end; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 140px; }
+    label { font-size: 0.75rem; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 0.4px; }
+    input { padding: 8px 12px; border: 1px solid #dde1ee; border-radius: 8px; font-size: 0.9rem; background: #fafbff; color: #1a1a2e; width: 100%; }
+    input:focus { outline: none; border-color: #4472c4; }
+    .btn { padding: 8px 18px; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s; white-space: nowrap; }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: #2e4a7a; color: #fff; }
+    .btn-warning { background: #e8a020; color: #fff; }
+    .btn-danger  { background: #c0392b; color: #fff; }
+    .btn-sm { padding: 5px 12px; font-size: 0.78rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th { background: #f0f3fb; color: #2e4a7a; font-weight: 600; padding: 10px 14px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.4px; }
+    td { padding: 10px 14px; border-bottom: 1px solid #f0f0f5; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafbff; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+    .badge-info { background: #eaf1fb; color: #2e4a7a; }
+    .empty { text-align: center; padding: 2rem; color: #aaa; font-size: 0.9rem; }
+    .actions { display: flex; gap: 6px; }
+    .mono { font-family: monospace; font-size: 0.82rem; color: #555; background: #f4f6fb; padding: 2px 6px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="brand">💰 Ramonify</a>
+    <a href="/sessions" class="active">Sessions</a>
+    <a href="/budget">Budget Cache</a>
+    <a href="/top-categories">Top Categories</a>
+  </nav>
+
+  <div class="container">
+    <h1>🔐 Session Management</h1>
+    <p class="subtitle">Redis Hash — key: session:userId — TTL: 3600s (1 hour)</p>
+
+    <% if (message) { %>
+      <div style="background:#fdecea;color:#c0392b;padding:10px 14px;border-radius:8px;font-size:0.88rem;margin-bottom:1rem;"><%= message %></div>
+    <% } %>
+
+    <!-- CREATE -->
+    <div class="card">
+      <h2>Log In a User — CREATE</h2>
+      <form action="/sessions" method="POST">
+        <div class="form-row">
+          <div class="form-group">
+            <label>User ID</label>
+            <input type="text" name="userId" placeholder="e.g. 42" required />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="text" name="email" placeholder="e.g. maya@email.com" required />
+          </div>
+          <button type="submit" class="btn btn-primary">Log In</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- READ -->
+    <div class="card">
+      <h2>Active Sessions — READ</h2>
+      <% if (sessions.length === 0) { %>
+        <div class="empty">No active sessions. Log a user in above.</div>
+      <% } else { %>
+        <table>
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th>User ID</th>
+              <th>Email</th>
+              <th>Login Time</th>
+              <th>TTL (seconds)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% sessions.forEach(s => { %>
+              <tr>
+                <td><span class="mono"><%= s.key %></span></td>
+                <td><%= s.userId %></td>
+                <td><%= s.email %></td>
+                <td><%= s.loginTime %></td>
+                <td><span class="badge badge-info"><%= s.ttl %>s</span></td>
+                <td>
+                  <div class="actions">
+                    <form action="/sessions/<%= s.userId %>/refresh" method="POST">
+                      <button class="btn btn-warning btn-sm">Refresh</button>
+                    </form>
+                    <form action="/sessions/<%= s.userId %>/delete" method="POST">
+                      <button class="btn btn-danger btn-sm">Log Out</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>
